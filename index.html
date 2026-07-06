@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FF7 Rebirth – Lifestream Companion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void:#05060E; --box1:#0E1030; --box2:#05050F; --line:#8E93B8; --text:#EDEFF8; --dim:#9CA2C4;
+    --mako:#4DF08C; --mako-d:#1FA85C; --gold:#E8C558; --meteor:#D5543A; --sky:#6FB4FF;
+    --display:'Cormorant Garamond',serif; --body:'Space Grotesk',system-ui,sans-serif; --mono:'Space Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--void); color:var(--text); font-family:var(--body); min-height:100vh; padding-bottom:90px;
+    background-image:
+      radial-gradient(ellipse at 50% -15%, rgba(77,240,140,.14), transparent 55%),
+      radial-gradient(circle, rgba(77,240,140,.05) 1px, transparent 1.4px);
+    background-size:100% 100%, 26px 26px;
+  }
+  ::selection{background:var(--mako);color:#03140A}
+
+  /* ---------- HERO ---------- */
+  header{padding:52px 20px 42px; position:relative}
+  header::after{content:""; position:absolute; left:0; right:0; bottom:0; height:1px;
+    background:linear-gradient(90deg,transparent,var(--mako),transparent)}
+  .hero-inner{max-width:1040px; margin:0 auto; text-align:center}
+  .eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:.34em; text-transform:uppercase; color:var(--mako)}
+  h1{font-family:var(--display); font-weight:700; line-height:1; font-size:clamp(40px,8vw,86px); margin:12px 0 4px; letter-spacing:.01em}
+  h1 em{font-style:normal; color:var(--mako); text-shadow:0 0 26px rgba(77,240,140,.55)}
+  .hero-sub{font-size:15.5px; max-width:640px; margin:8px auto 0; color:var(--dim)}
+  .gauges{display:flex; flex-wrap:wrap; gap:26px; margin:28px auto 0; max-width:880px; justify-content:center; text-align:left}
+  .gauge{min-width:260px; flex:1; max-width:420px}
+  .glabel{display:flex; justify-content:space-between; font-family:var(--mono); font-size:11px; letter-spacing:.12em; margin-bottom:6px; color:var(--dim)}
+  .gbar{height:11px; background:#0A0B1D; border:1px solid var(--line); border-radius:3px; overflow:hidden}
+  .gfill{height:100%; transition:width .5s ease; width:0%}
+  .gfill.g1{background:linear-gradient(90deg,var(--mako-d),var(--mako))}
+  .gfill.g2{background:linear-gradient(90deg,#A8842B,var(--gold))}
+  .gnote{font-family:var(--mono); font-size:10.5px; color:#666D96; margin-top:5px}
+
+  /* ---------- NAV ---------- */
+  nav{position:sticky; top:0; z-index:50; background:rgba(5,6,14,.95); backdrop-filter:blur(6px);
+    border-bottom:1px solid #2A2E52; display:flex; gap:4px; overflow-x:auto; padding:10px 14px; justify-content:safe center; scrollbar-width:none}
+  nav::-webkit-scrollbar{display:none}
+  .tab{font-family:var(--body); font-weight:500; letter-spacing:.05em; font-size:13.5px; color:var(--dim); background:transparent;
+    border:1px solid transparent; border-radius:6px; padding:8px 15px; cursor:pointer; white-space:nowrap; transition:all .15s}
+  .tab::before{content:"▸ "; color:transparent; transition:color .15s}
+  .tab:hover{color:var(--text)}
+  .tab.active{color:var(--mako); border-color:var(--mako); background:rgba(77,240,140,.07)}
+  .tab.active::before{color:var(--mako)}
+  .tab:focus-visible, button:focus-visible, input:focus-visible{outline:2px solid var(--gold); outline-offset:2px}
+
+  /* ---------- PANELS: classic FF menu boxes ---------- */
+  main{max-width:1040px; margin:32px auto 0; padding:0 16px}
+  section{display:none}
+  section.show{display:block; animation:rise .28s ease}
+  @keyframes rise{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:none}}
+  @media (prefers-reduced-motion:reduce){ section.show{animation:none} .gfill{transition:none} }
+
+  .panel{background:linear-gradient(180deg,var(--box1),var(--box2)); border:2px solid var(--line); border-radius:8px;
+    box-shadow:inset 0 0 0 1px #04040C, 0 4px 22px rgba(0,0,0,.5); padding:24px 22px 26px; margin-bottom:28px}
+  .panel h2{font-family:var(--display); font-weight:700; font-size:clamp(22px,3.8vw,30px); line-height:1.05}
+  .panel h2 .mark{color:var(--mako)}
+  .kicker{font-family:var(--mono); font-size:10px; letter-spacing:.3em; text-transform:uppercase; color:var(--gold); margin-bottom:4px}
+  p.lead{margin:10px 0 14px; font-size:14.5px; max-width:74ch; color:#C6CAE3}
+
+  .badge{display:inline-block; font-family:var(--mono); font-size:9.5px; font-weight:700; letter-spacing:.08em;
+    padding:2.5px 8px; text-transform:uppercase; border-radius:3px; margin-right:6px}
+  .b-mako{background:rgba(77,240,140,.14); color:var(--mako); border:1px solid rgba(77,240,140,.45)}
+  .b-gold{background:rgba(232,197,88,.13); color:var(--gold); border:1px solid rgba(232,197,88,.45)}
+  .b-met{background:rgba(213,84,58,.16); color:#FF8A6E; border:1px solid rgba(213,84,58,.5)}
+  .b-plain{background:#1B1E3E; color:var(--dim)}
+
+  .row{display:flex; gap:12px; align-items:flex-start; padding:11px 4px; border-bottom:1px solid #23264A}
+  .row:last-child{border-bottom:none}
+  .row.done .txt{opacity:.42}
+  .row.done .txt .t-name{text-decoration:line-through}
+  .chk{appearance:none; flex:0 0 auto; width:22px; height:22px; margin-top:2px; border:2px solid var(--mako);
+    background:transparent; cursor:pointer; border-radius:4px; position:relative}
+  .chk:checked{background:var(--mako)}
+  .chk:checked::after{content:"✓"; position:absolute; inset:0; display:grid; place-items:center; color:#03140A; font-weight:800; font-size:14px}
+  .txt{font-size:14px}
+  .txt small{display:block; color:var(--dim); font-size:12.5px; margin-top:2px}
+
+  /* region grid */
+  .cgrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px}
+  .ccard{border:1.5px solid var(--line); background:linear-gradient(180deg,#101336,#07081A); border-radius:8px; padding:14px}
+  .ccard .arc{font-family:var(--mono); font-size:9.5px; letter-spacing:.22em; text-transform:uppercase; color:var(--mako)}
+  .ccard h3{font-family:var(--display); font-weight:700; font-size:21px}
+  .ccard .meta{font-size:12.5px; color:var(--dim); margin:3px 0 8px}
+  .mini{display:flex; gap:9px; align-items:center; padding:6px 2px; font-size:13px}
+  .mini .chk{width:19px; height:19px; margin-top:0}
+  .ccard.done-all{border-color:var(--mako); box-shadow:0 0 18px rgba(77,240,140,.25)}
+
+  /* boss cards */
+  .boss{border:1.5px solid var(--line); border-left:4px solid var(--meteor); background:linear-gradient(180deg,#101336,#07081A);
+    border-radius:8px; padding:14px 16px; margin-bottom:12px}
+  .boss.mako{border-left-color:var(--mako)}
+  .boss.gold{border-left-color:var(--gold)}
+  .boss h3{font-family:var(--display); font-weight:700; font-size:19px}
+  .boss .where{font-family:var(--mono); font-size:10.5px; color:var(--dim); letter-spacing:.1em; margin:2px 0 8px; text-transform:uppercase}
+  .boss p{font-size:13.5px; color:#C6CAE3}
+
+  /* bond */
+  .rankctl{display:flex; align-items:center; gap:8px}
+  .rbtn{font-family:var(--mono); font-weight:700; font-size:15px; width:29px; height:29px; border:1.5px solid var(--mako);
+    background:transparent; color:var(--mako); cursor:pointer; border-radius:6px}
+  .rbtn:active{background:var(--mako); color:#03140A}
+  .pips{display:flex; gap:3px; flex:1}
+  .pip{flex:1; height:10px; background:#0A0B1D; border:1px solid #33375E; border-radius:3px}
+  .pip.on{background:var(--mako); border-color:transparent}
+  .pip.max{background:var(--gold); border-color:transparent}
+  .rnum{font-family:var(--mono); font-weight:700; font-size:12px; min-width:36px; text-align:right}
+
+  /* counters */
+  .counter{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:13px 4px;
+    border-bottom:1px solid #23264A; flex-wrap:wrap}
+  .counter:last-child{border:none}
+  .cinfo{flex:1; min-width:220px}
+  .cinfo b{font-size:14.5px}
+  .cinfo small{display:block; color:var(--dim); font-size:12.5px}
+  .cctl{display:flex; align-items:center; gap:8px}
+  .cval{font-family:var(--mono); font-weight:700; font-size:13.5px; min-width:78px; text-align:center;
+    border:1px solid var(--line); color:var(--gold); padding:4px 8px; border-radius:5px; background:#0A0B1D}
+  .cval.full{color:var(--mako); border-color:var(--mako)}
+
+  .note{font-size:12.5px; color:var(--dim); margin-top:14px; border-top:1px solid #2A2E52; padding-top:9px}
+  .footer{max-width:1040px; margin:8px auto 0; padding:0 16px; text-align:center; font-family:var(--mono); font-size:10.5px;
+    color:#666D96; letter-spacing:.16em; text-transform:uppercase}
+  .reset{background:none; border:1px solid #3A3F6B; color:var(--dim); font-family:var(--mono); font-size:10.5px;
+    padding:5px 10px; cursor:pointer; margin-left:10px; border-radius:5px}
+  .reset:hover{border-color:var(--meteor); color:#FF8A6E}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hero-inner">
+    <div class="eyebrow">Lifestream-Protokoll · Platin: „The Planet's Hope"</div>
+    <h1>FF7 <em>Rebirth</em><br>Companion</h1>
+    <p class="hero-sub">World Intel, 36 Side Quests, Protorelikte, Minispiel-Wahnsinn, Gefährten-Bande und Boss-Taktiken bis Sephiroth Reborn – der Weg zur härtesten FF-Platin (~70–80 Std., 2 Durchgänge). Fortschritt wird automatisch gespeichert.</p>
+    <div class="gauges">
+      <div class="gauge">
+        <div class="glabel"><span>GESAMT-FORTSCHRITT</span><span id="ppct">0%</span></div>
+        <div class="gbar"><div class="gfill g1" id="pfill"></div></div>
+        <div class="gnote" id="memnote">Alle Tracker der App zusammen</div>
+      </div>
+      <div class="gauge">
+        <div class="glabel"><span>SIDE QUESTS</span><span id="sqval">0 / 36</span></div>
+        <div class="gbar"><div class="gfill g2" id="sqfill"></div></div>
+        <div class="gnote">Zähler im Sammel-Tab · nichts ist missable (Kapitelauswahl!)</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav id="nav"></nav>
+<main id="main"></main>
+<div class="footer">No promises to keep. <button class="reset" id="resetBtn">Fortschritt zurücksetzen</button></div>
+
+<script>
+/* =================== DATEN =================== */
+const RULES = [
+ ["Nichts ist missable – aber Timing spart Stunden","Nach der Story gibt es Kapitelauswahl; in Kapitel 13 ist die komplette offene Welt zugänglich. Trotzdem: Kampf-Intel und Side Quests direkt in der jeweiligen Region erledigen – wer zu stark zurückkommt, langweilt sich, wer im Story-Level bleibt, hat die besseren Kämpfe."],
+ ["Assess-Materia IMMER dabei","Jeden neuen Gegner analysieren. Mehrere Kampfsimulationen verlangen eine Mindestzahl analysierter Monster pro Region – nachträglich farmen nervt."],
+ ["Waffen-Fertigkeiten sofort meistern","Jede neue Waffe anlegen und ihre Fähigkeit bis zur Meisterschaft nutzen („Well-Rounded"). Lila Truhen-Waffen, die du übersiehst, tauchen später im Shop auf."],
+ ["World Intel = Materia-Motor","Alle orangen Kartenmarker füttern Chadley: Nur mit komplettem World Intel entwickelst du alle Materia. Die Protorelikt-Ketten (4 Phänomen-Intel pro Region) zuerst – sie verstecken eigene Minispiele und führen zu Gilgamesh."],
+ ["Piano: nur A-Rang nötig","6 Stücke (5 an den Klavieren, das 6. aus der Nibelheim-Quest „My White-Haired Angel"), alle mit A-Rang spielen und Dorian ansprechen. S-Rang ist reines Prestige – nicht verkrampfen."],
+ ["Minispiele VOR den VR-Herausforderungen","Fast jedes Minispiel verlangt die Höchstwertung, belohnt aber starke Waffen/Accessoires. Erst Party-Animal werden, dann in Chadleys Hölle steigen."],
+ ["Götterdämmerung zuerst","Nach Gilgamesh (Kap. 13) öffnen sich Brutal-/Legendär-Missionen. Priorität: „Brutal: Herrscher der Außenwelten" → das Götterdämmerung-Accessoire (Limit lädt automatisch) trägt dich durch alles Weitere – die 9 Legendär-Missionen sind härter als der komplette Hard-Durchgang."],
+ ["Hard Mode = zweiter Durchgang","Keine Items im Kampf, MP sind kostbar: Gebets-/Chakra-Materia, MP-Absorption und Bänke-Routen einplanen. Vorher im ersten Durchgang Materia leveln (Magnify + Angriffszauber in Chadleys Regionen-Sims = bestes AP-Farming)."],
+ ["Johnnys Schatzkammer füttern","Sammler-Items aus Quests und Minispielen in der Seaside Inn abgeben (Trophäen bei 10/30/60). Das allerletzte Stück hängt an den Brutal-Missionen."],
+ ["Der Gnadenpatch existiert","Seit dem „Streamlined Progression"-Update gibt es optionale Boosts (HP/MP voll, 9.999er-Schaden), die Trophäen NICHT deaktivieren. Kein Schamgefühl – wer nur die Story-Platin will, darf abkürzen."]
+];
+
+const REGIONS = [
+ {id:"grass", n:"Grasland", meta:"Kalm & Chocobo-Ranch – Einstieg, Bergchocobo folgt später"},
+ {id:"junon", n:"Junon", meta:"Klippen & Küste – Segel-Chocobo"},
+ {id:"corel", n:"Corel", meta:"Wüste & Gold Saucer – Buggy-Gebiete beachten"},
+ {id:"gongaga", n:"Gongaga", meta:"Dschungel-Labyrinth – Pilz-Sprungchocobo, Geduld mitbringen"},
+ {id:"cosmo", n:"Cosmo Canyon", meta:"Schluchten – Flug-/Gleitchocobo"},
+ {id:"nibel", n:"Nibel", meta:"Gebirge – letztes großes Intel-Gebiet vor dem Finale"}
+];
+const REGION_TASKS = [
+ ["intel","World Intel 100 % (alle orangen Marker)"],
+ ["proto","Protorelikt-Kette (4 Phänomen-Intel)"],
+ ["summon","Esper-Heiligtum komplett (VR-Kampf geschwächt)"],
+ ["choco","Regions-Chocobo gefangen"],
+ ["dig","Vergrabenen Schatz ausgegraben (1 pro Region)"]
+];
+
+const BOSSES = [
+ {c:"", n:"Materia-Wächter", w:"Kapitel 1 · Mt. Nibel (Rückblende)", tips:"Das Tutorial mit Zähnen: Auf die leuchtenden Materia-Auswüchse konzentrieren, die Synergie-Kommandos mit Sephiroth brav mitnehmen und an den Sprungangriffen das Ausweich-Timing lernen. Hier stellt das Spiel die Schock-Regel vor: Schwächen ausnutzen → Schock-Leiste → draufhalten."},
+ {c:"", n:"Midgardsormr", w:"Kapitel 2 · Grasland", tips:"Die Riesenschlange bestraft Klebrigkeit: Nach ihren Biss-Lunges und dem Untertauchen öffnet sich das Punish-Fenster am Kopf. Eis-Materia mitbringen, Aeriths Ward für sicheres Casten legen und die Flächen-Markierungen ernst nehmen – das Gift-Feld frisst Tränke, die du noch brauchst."},
+ {c:"", n:"Schrecken der Tiefe", w:"Junon-Arc", tips:"Der Seeteufel lebt von Distanz-Frust: Blitz-Materia auf zwei Charaktere, die Tentakel/Anhängsel zuerst brechen, und sobald er zum Wasserstrahl ansetzt, seitlich ausweichen statt blocken. Fernkämpfer (Barret, Aerith) tragen den Kampf, Nahkämpfer punishen nur die Landephasen."},
+ {c:"", n:"Jenova Emergent", w:"Kapitel 5 · Shinra-8", tips:"Erst die Ableger und Tentakel räumen, sonst ertrinkt das Team in Projektilen. ATB für die Phasenwechsel aufsparen, Statusheilung bereithalten und in der Illusionsphase ruhig bleiben – Fokus aufs Hauptziel, sobald es verwundbar aufleuchtet. Ein Klassiker der Regel „Adds zuerst"."},
+ {c:"", n:"Grasptropod", w:"Costa del Sol – Strandkampf", tips:"Der Kampf mit Handicap: Du trittst in Badekleidung mit reduziertem Loadout an – vorher die besten verfügbaren Materia in die wenigen Slots! Feuerzauber auf den Panzer, Synergie-Fähigkeiten für ATB, und die Laserphase am Rand der Arena auslaufen lassen."},
+ {c:"", n:"Dyne", w:"Corel-Arc · Gefängnis", tips:"Ein Schusswechsel-Duell mit Barret im Zentrum: Seine Salven seitlich umlaufen, die Nachlade-/Überhitzungsfenster mit voller ATB bestrafen und Deckung nutzen, wenn er die Arena sprengt. Emotional der härteste Kampf des Spiels – mechanisch fair, wenn du geduldig bleibst."},
+ {c:"mako", n:"Gi Nattak", w:"Cosmo Canyon · Gi-Höhlen", tips:"Die Geisterflammen sind der eigentliche Gegner: Sie heilen und verstärken ihn – IMMER zuerst löschen. Red XIII gehört in dieses Team, Heilzauber schaden dem Geistervolk-Thema entsprechend mehr, als man denkt, und seine Sensenkombos verlangen saubere Perfect Dodges statt Face-Tanking."},
+ {c:"mako", n:"Galian Beast", w:"Nibelheim · Shinra-Villa", tips:"Ein reiner Reflex-Check: brutale Sprungkombos, Feuerprojektile, kurze Fenster. Blocken ist hier oft besser als ausweichen, Manawall/Schutz-Zauber vorab, und die Wut-Phase in der zweiten Hälfte NICHT mit Items durchtanken, sondern defensiv überleben und danach punishen."},
+ {c:"mako", n:"Roches Abschied", w:"Nibel-Region", tips:"Das letzte Duell mit dem Speed-Junkie: schnelle Schwertserien, die Counter belohnen – Clouds Punisher-Modus-Konter ist hier die halbe Miete. Kein Elementtrick, nur sauberes Timing. Einer der besten 1-gegen-1-Kämpfe des Spiels, genieß ihn."},
+ {c:"gold", n:"Dämonenwand", w:"Kapitel 13 · Tempel der Alten", tips:"Ein DPS-Rennen gegen die heranrückende Wand: Limit Breaks und Esper VOR dem Kampf laden bzw. früh zünden, die Arme/Kerne brechen für Schock, und Fernkampf-Charaktere puffern, wenn sie dich in die Ecke drückt. Wer trödelt, verliert – hier zählt Tempo über Vorsicht."},
+ {c:"gold", n:"Roter Drache", w:"Kapitel 13 · Tempel der Alten", tips:"Klassiker: Flug- und Sturzflugphasen abwarten, Landungen bestrafen, Eis hilft. Feuerresistenz-Accessoires oder Elementar-Materia + Feuer in der Rüstung entschärfen seinen Atem fast komplett – der Kampf wird damit vom Härtetest zur Formalie."},
+ {c:"gold", n:"Jenova Lifeclinger", w:"Kapitel 14 · Finale", tips:"Mehrteiliger Marathon mit Teamwechseln: ALLE Charaktere brauchen Ausrüstung und Materia – die Bank darf nicht nackt sein! Anhängsel priorisieren, Heiler in jedem Team verteilen, MP-Haushalt über die Phasen strecken. Vor dem Finale einmal komplett durchs Materia-Menü gehen."},
+ {c:"gold", n:"Sephiroth Reborn & das letzte Duell", w:"Kapitel 14 · Finale", tips:"Multi-Phasen-Spektakel mit wechselnden Konstellationen: Limit Breaks für die Schock-Phasen aufsparen, Elementarwechsel per Assess im Blick behalten und die Einwebungen der Story-Momente als Verschnaufpausen nutzen. Auf Hard gilt: Götterdämmerung an Cloud, Gebets-Materia im Team, und die Synergie-Fähigkeiten sind deine kostenlose ATB-Druckerei."},
+ {c:"gold", n:"Gilgamesh", w:"Gilgamesh-Insel – nach allen Protorelikten", tips:"Der Superboss-Ritus: Er wechselt Waffen, Stile und Elemente und kopiert dabei halb Final Fantasy. Assess sofort, auf seine angekündigten „Regeln" pro Phase reagieren, Debuffs (Slow/Stop-Resistenz!) mitbringen und die Esper-Heiligtümer vorher abschließen – jeder geschwächte VR-Esper macht auch dich stärker. Sein Fall öffnet Brutal & Legendär."},
+ {c:"", n:"Brutal & Legendär: Überlebensregeln", w:"Chadleys Kampfsimulator – Endgame", tips:"Reihenfolge: „Herrscher der Außenwelten" → Götterdämmerung → Rest. Loadout-Grundgerüst: First Strike + ATB-Boost-Accessoires, Magnify an Heilung ODER an Angriffszauber, Elementar-Materia defensiv gegen die Arena-Schwerpunkte. Zwischen den Wellen heilt kein Item – Gebet/Chakra sind Pflicht. Die 9 Legendär-Missionen sind der Endgegner der Platin: Scheitern einplanen, Setups iterieren."}
+];
+
+const MINIGAMES = [
+ {id:"m1", t:"Queen's Blood", s:"Das Kartenspiel zieht sich durchs ganze Spiel: jeden Gegner schlagen, Karten sammeln, Spielerrang maxen (gibt zusätzlich einen Schatzkammer-Gegenstand). Das Turnier auf der Shinra-8 in Kapitel 5 mitnehmen!"},
+ {id:"m2", t:"Chocobo-Rennen (Gold Saucer)", s:"Alle Rennen gewinnen – komplett freigeschaltet über die Quest „Esoteric Secrets of the Elders" (ab Kap. 12). Piko + Speed/Beschleunigung, Drift-Boosts stapeln. Der Platin-Cup gehört zur „Ultimate Party Animal"-Kette."},
+ {id:"m3", t:"Piano (6 Stücke, A-Rang)", s:"5 Klaviere + „My White-Haired Angel" (Nibelheim). Alle mit A spielen, dann Dorian ansprechen."},
+ {id:"m4", t:"Fort Condor & Gears and Gambits", s:"Beide Strategie-Minispiele auf allen Stufen – Teil der Protorelikt-Ketten."},
+ {id:"m5", t:"Cactuar Crush & Run Wild & Desert Rush", s:"Kampf-Minispiele mit Highscore-Pflicht – mit gutem Build und den richtigen Synergie-Fähigkeiten machbar."},
+ {id:"m6", t:"3D-Brawler (bis Sephiroth!)", s:"Reines Ausweich-Pattern-Lernen im Gold Saucer – der Sephiroth-Kampf hat eine eigene Trophäe. Ruhe bewahren, Muster auswendig lernen."},
+ {id:"m7", t:"Galactic Saviors & Pirate's Rampage & Dolphin-Show", s:"Shooter-/Geschicklichkeitstrio mit Highscores – Pirate's Rampage belohnt ein starkes Accessoire."},
+ {id:"m8", t:"Glide de Chocobo, Leapfrog & Moogle-Unfug", s:"Die Geduldsprüfungen. Für Leapfrog: Kamera hoch, Rhythmus statt Panik."},
+ {id:"m9", t:"Sit-up-Duell gegen Jules & Co.", s:"Das Rhythmus-Muskelspiel kehrt zurück – Eingaben vor dem Beat einqueuen."},
+ {id:"m10", t:"Ultimate Party Animal", s:"Johnnys Abschlusskette: verlangt die Ultimate-Stufen der Minispiele inkl. Platin-Cup – der 7-Sterne-Ritterschlag und Voraussetzung für die letzte Schatzkammer-Stufe."}
+];
+
+const BONDS = [
+ {id:"tifa", n:"Tifa", note:"Kindheitsfreundin – viele Bande-Momente in Kalm, Costa del Sol & Nibelheim"},
+ {id:"aerith", n:"Aerith", note:"Blumenmädchen – Quests mit ihrem Porträt konsequent mitnehmen"},
+ {id:"barret", n:"Barret", note:"Corel ist SEINE Region – dort zahlen die Quests doppelt auf die Bande ein"},
+ {id:"red", n:"Red XIII", note:"Cosmo Canyon ist sein Heimspiel"},
+ {id:"yuffie", n:"Yuffie", note:"Stößt in Junon dazu – Materia-Quests = Yuffie-Quests"},
+ {id:"cait", n:"Cait Sith", note:"Spät dabei – seine Bande-Fenster sind knapper"}
+];
+
+const COLLECT = [
+ {id:"sq", n:"Side Quests", max:36, s:"Quest-Geber mit Gefährten-Porträt stärken zusätzlich die jeweilige Bande. Speist die Anzeige im Header."},
+ {id:"intel", n:"Regionen mit 100 % World Intel", max:6, s:"Fortschrittsbalken unten links auf der Regionskarte – alle sechs voll = alle Chadley-Materia entwickelbar."},
+ {id:"proto", n:"Protorelikt-Regionen", max:6, s:"Je 4 Phänomen-Intel; alle sechs Regionen → Gilgamesh-Insel erscheint."},
+ {id:"piano", n:"Klavierstücke mit A-Rang", max:6, s:"Danach Dorian ansprechen für die Trophäe."},
+ {id:"trove", n:"Schatzkammer-Spenden (Johnny)", max:60, s:"Trophäenstufen bei 10/30/60 – für „alles gespendet" braucht es am Ende auch die Brutal-Missionen."},
+ {id:"legend", n:"Legendäre VR-Missionen", max:9, s:"Der Endboss der Platin – härter als der ganze Hard-Durchgang. Götterdämmerung zuerst holen!"},
+ {id:"dig", n:"Chocobo-Grabschätze", max:8, s:"6 vergrabene Schätze (einer pro Region) + 2 Hasen-Schätze – Voraussetzung für Schatzkammer-Stufen."},
+ {id:"hard", n:"Hard-Mode-Kapitel", max:14, s:"Zweiter Durchgang per Kapitelauswahl: keine Items im Kampf, MP knapp – Gebet/Chakra-Materia und Bänke-Routen nutzen."}
+];
+
+/* =================== STATE =================== */
+let state = {items:{}, region:{}, bond:{}, coll:{}};
+let memoryOnly=false;
+const KEY="ff7rebirth-companion";
+
+async function loadState(){
+  try{
+    if(!window.storage) throw 0;
+    const r=await window.storage.get(KEY);
+    if(r && r.value) state=Object.assign(state, JSON.parse(r.value));
+  }catch(e){/* frisch starten */}
+}
+let t=null;
+function saveState(){
+  clearTimeout(t);
+  t=setTimeout(async()=>{
+    try{ if(!window.storage){memoryOnly=true; flagMem(); return;} await window.storage.set(KEY, JSON.stringify(state)); }
+    catch(e){ memoryOnly=true; flagMem(); }
+  },350);
+}
+function flagMem(){ if(memoryOnly) document.getElementById("memnote").textContent="Hinweis: Speicher nicht verfügbar – Fortschritt gilt nur für diese Sitzung."; }
+
+/* =================== PROGRESS =================== */
+function updateProgress(){
+  let total=0, done=0;
+  MINIGAMES.forEach(m=>{ total++; if(state.items[m.id]) done++; });
+  REGIONS.forEach(r=>REGION_TASKS.forEach(([k])=>{ total++; if(state.region[r.id+"_"+k]) done++; }));
+  COLLECT.forEach(c=>{ total+=c.max; done+=Math.min(c.max, state.coll[c.id]||0); });
+  BONDS.forEach(b=>{ total+=10; done+=Math.min(10, state.bond[b.id]||0); });
+  const pct = total? Math.round(done/total*100):0;
+  document.getElementById("pfill").style.width=pct+"%";
+  document.getElementById("ppct").textContent=pct+"%";
+  const sq=Math.min(36, state.coll["sq"]||0);
+  document.getElementById("sqfill").style.width=(sq/36*100)+"%";
+  document.getElementById("sqval").textContent=sq+" / 36";
+}
+
+/* =================== UI =================== */
+const el=(t,c,h)=>{const e=document.createElement(t); if(c)e.className=c; if(h!=null)e.innerHTML=h; return e;};
+const TABS=[["regeln","Roadmap"],["regionen","Regionen"],["bosse","Bosse"],["minis","Minispiele"],["party","Gefährten"],["sammeln","Sammelziele"]];
+
+function buildNav(){
+  const nav=document.getElementById("nav");
+  TABS.forEach(([id,label],i)=>{
+    const b=el("button","tab"+(i===0?" active":""),label);
+    b.onclick=()=>{
+      document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+      b.classList.add("active");
+      document.querySelectorAll("section").forEach(s=>s.classList.remove("show"));
+      document.getElementById("sec-"+id).classList.add("show");
+      window.scrollTo({top:0,behavior:"smooth"});
+    };
+    nav.appendChild(b);
+  });
+}
+
+function renderRules(){
+  const s=el("section","show"); s.id="sec-regeln";
+  const p=el("div","panel");
+  p.append(el("div","kicker","Missionsbriefing"));
+  p.append(el("h2",null,"Die 10 Regeln für die <span class='mark'>Planeten-Platin</span>"));
+  p.append(el("p","lead","61 Trophäen, keine davon missable, aber zwei Durchgänge (Normal → Hard) und der härteste Endspurt der Serie: Chadleys Brutal- und Legendär-Missionen. So bleibt die Reise ein Roadtrip statt ein Marsch:"));
+  RULES.forEach((r,i)=>{
+    const row=el("div","row");
+    row.append(el("div","badge b-mako",String(i+1).padStart(2,"0")));
+    row.append(el("div","txt","<span class='t-name'><b>"+r[0]+"</b></span><small>"+r[1]+"</small>"));
+    p.append(row);
+  });
+  s.append(p);
+  return s;
+}
+
+function renderRegions(){
+  const s=el("section"); s.id="sec-regionen";
+  const p=el("div","panel");
+  p.append(el("div","kicker","Chadleys Weltkarte"));
+  p.append(el("h2",null,"World Intel pro <span class='mark'>Region</span>"));
+  p.append(el("p","lead","Pro Region: alle orangen Marker (Türme, Kampf-Intel, Lebensquellen, Expeditions-Intel), die Protorelikt-Kette, das Esper-Heiligtum, der Regions-Chocobo und ein vergrabener Schatz. Alle sechs Protorelikt-Ketten zusammen beschwören Gilgameshs Insel herauf."));
+  const grid=el("div","cgrid");
+  REGIONS.forEach(r=>{
+    const card=el("div","ccard");
+    card.append(el("div","arc","Region"));
+    card.append(el("h3",null,r.n));
+    card.append(el("div","meta",r.meta));
+    const boxes=[];
+    REGION_TASKS.forEach(([k,label])=>{
+      const key=r.id+"_"+k;
+      const mini=el("div","mini");
+      const box=el("input","chk"); box.type="checkbox"; box.checked=!!state.region[key];
+      box.setAttribute("aria-label",r.n+": "+label);
+      box.onchange=()=>{ state.region[key]=box.checked; saveState(); updateProgress(); refresh(); };
+      boxes.push(box);
+      mini.append(box, el("span",null,label));
+      card.append(mini);
+    });
+    function refresh(){ card.classList.toggle("done-all", boxes.every(b=>b.checked)); }
+    refresh();
+    grid.append(card);
+  });
+  p.append(grid);
+  p.append(el("div","note","Die Esper der Heiligtümer (u. a. Titan, Phoenix, Alexander, Kujata, Odin, Bahamut Arisen) werden pro gefundenem Kristall im VR-Kampf schwächer – erst Kristalle, dann kämpfen."));
+  s.append(p);
+  return s;
+}
+
+function renderBosses(){
+  const s=el("section"); s.id="sec-bosse";
+  const p=el("div","panel");
+  p.append(el("div","kicker","Schlachtplan"));
+  p.append(el("h2",null,"Boss-Taktiken: vom Materia-Wächter bis <span class='mark'>Sephiroth</span>"));
+  p.append(el("p","lead","Spoilerarm: Namen und grobe Orte, keine Story-Details. Universalgesetz von Rebirth: Assess → Schwäche → Druck → Schock → Bersten. Und Synergie-Fähigkeiten kosten nichts – benutzt sie!"));
+  BOSSES.forEach(b=>{
+    const card=el("div","boss "+b.c);
+    card.append(el("h3",null,b.n));
+    card.append(el("div","where",b.w));
+    card.append(el("p",null,b.tips));
+    p.append(card);
+  });
+  p.append(el("div","note","Auf Hard gelten alle Tipps doppelt – plus: keine Items, also Heilung über Materia (Gebet, Chakra) einplanen und MP an Bänken haushalten."));
+  s.append(p);
+  return s;
+}
+
+function renderMinis(){
+  const s=el("section"); s.id="sec-minis";
+  const p=el("div","panel");
+  p.append(el("div","kicker","Gold Saucer & Co."));
+  p.append(el("h2",null,"Der Minispiel-<span class='mark'>Marathon</span>"));
+  p.append(el("p","lead","Rebirths berüchtigtster Platin-Anteil: (fast) überall zählt die Höchstwertung. Guter Trost – viele belohnen Waffen und Accessoires, die du für die VR-Endgegner ohnehin willst."));
+  MINIGAMES.forEach(m=>{
+    const row=el("div","row"+(state.items[m.id]?" done":""));
+    const box=el("input","chk"); box.type="checkbox"; box.checked=!!state.items[m.id];
+    box.setAttribute("aria-label",m.t);
+    box.onchange=()=>{ state.items[m.id]=box.checked; row.classList.toggle("done",box.checked); saveState(); updateProgress(); };
+    row.append(box, el("div","txt","<span class='t-name'><span class='badge b-gold'>Highscore</span><b>"+m.t+"</b></span><small>"+m.s+"</small>"));
+    p.append(row);
+  });
+  s.append(p);
+  return s;
+}
+
+function renderParty(){
+  const s=el("section"); s.id="sec-party";
+  const p=el("div","panel");
+  p.append(el("div","kicker","Bande der Gefährten"));
+  p.append(el("h2",null,"Beziehungs-<span class='mark'>Tracker</span>"));
+  p.append(el("p","lead","Side Quests mit Gefährten-Porträt und bestimmte Dialogwahlen stärken die jeweilige Bande – wer beim Gold-Saucer-Besuch in Kapitel 12 vorne liegt, bekommt das Skywheel-Date. Skala hier: 0–10 als dein persönlicher Eindruck (die Smiley-Anzeige im Spiel zeigt den echten Stand). Keine Trophäe hängt an einem bestimmten Date – folge dem Herzen, nicht dem Guide."));
+  const grid=el("div","cgrid");
+  BONDS.forEach(c=>{
+    const card=el("div","ccard");
+    card.append(el("div","arc","Gefährte"));
+    card.append(el("h3",null,c.n));
+    card.append(el("div","meta",c.note));
+    const ctl=el("div","rankctl");
+    const minus=el("button","rbtn","−"); minus.setAttribute("aria-label","Bande senken: "+c.n);
+    const plus=el("button","rbtn","+"); plus.setAttribute("aria-label","Bande erhöhen: "+c.n);
+    const pips=el("div","pips"); const num=el("div","rnum");
+    for(let i=0;i<10;i++) pips.append(el("div","pip"));
+    function draw(){
+      const r=Math.min(10,Math.max(0,state.bond[c.id]||0));
+      pips.querySelectorAll(".pip").forEach((pp,i)=>pp.className="pip"+(i<r?(r===10?" max":" on"):""));
+      num.textContent=r+"/10";
+    }
+    minus.onclick=()=>{state.bond[c.id]=Math.max(0,(state.bond[c.id]||0)-1); draw(); saveState(); updateProgress();};
+    plus.onclick=()=>{state.bond[c.id]=Math.min(10,(state.bond[c.id]||0)+1); draw(); saveState(); updateProgress();};
+    ctl.append(minus,pips,plus,num); card.append(ctl); draw();
+    grid.append(card);
+  });
+  p.append(grid);
+  p.append(el("div","note","Für ein anderes Date reicht später die Kapitelauswahl mit angepassten Quest-Prioritäten – nichts ist verloren."));
+  s.append(p);
+  return s;
+}
+
+function renderCollect(){
+  const s=el("section"); s.id="sec-sammeln";
+  const p=el("div","panel");
+  p.append(el("div","kicker","Inventar des Wanderers"));
+  p.append(el("h2",null,"Sammelziele & <span class='mark'>Zähler</span>"));
+  COLLECT.forEach(c=>{
+    const row=el("div","counter");
+    const info=el("div","cinfo","<b>"+c.n+"</b><small>"+c.s+"</small>");
+    const ctl=el("div","cctl");
+    const minus=el("button","rbtn","−"); minus.setAttribute("aria-label",c.n+" verringern");
+    const plus=el("button","rbtn","+"); plus.setAttribute("aria-label",c.n+" erhöhen");
+    const val=el("div","cval");
+    function draw(){
+      const v=Math.min(c.max,Math.max(0,state.coll[c.id]||0));
+      val.textContent=v+" / "+c.max;
+      val.classList.toggle("full", v===c.max);
+    }
+    minus.onclick=()=>{state.coll[c.id]=Math.max(0,(state.coll[c.id]||0)-1); draw(); saveState(); updateProgress();};
+    plus.onclick=()=>{state.coll[c.id]=Math.min(c.max,(state.coll[c.id]||0)+1); draw(); saveState(); updateProgress();};
+    ctl.append(minus,val,plus); row.append(info,ctl); draw();
+    p.append(row);
+  });
+  p.append(el("div","note","Nicht für die Platin nötig (also optional): offene-Welt-Verstecke (Caches), Chocobo-Haltestellen, Manuskripte und S-Ränge am Klavier. Wer sie trotzdem sammelt, tut es aus Liebe."));
+  s.append(p);
+  return s;
+}
+
+/* =================== INIT =================== */
+async function init(){
+  await loadState();
+  buildNav();
+  const main=document.getElementById("main");
+  main.append(renderRules(), renderRegions(), renderBosses(), renderMinis(), renderParty(), renderCollect());
+  updateProgress();
+  document.getElementById("resetBtn").onclick=async()=>{
+    if(!confirm("Wirklich den gesamten Fortschritt zurücksetzen?")) return;
+    state={items:{},region:{},bond:{},coll:{}};
+    try{ if(window.storage) await window.storage.delete(KEY); }catch(e){}
+    location.reload();
+  };
+}
+init();
+</script>
+</body>
+</html>
